@@ -18,6 +18,7 @@ type KanbnColumns [][]struct {
 	Metadata    struct {
 		Assigned string        `json:"assigned"`
 		Created  string        `json:"created"`
+		Completed  string        `json:"completed"`
 		Progress int           `json:"progress"`
 		Started  *string       `json:"started,omitempty"`
 		Tags     []interface{} `json:"tags"`
@@ -89,7 +90,11 @@ func renderBoard(r io.Reader, w io.Writer) error {
 		// convert columns of rows into rows of columns
 		for curCol, column := range lane.Columns {
 			for colRow, task := range column {
-				rows[colRow][curCol] = task.Name
+                                complete := ""
+                                if task.Progress == 1 || task.Metadata.Completed != "" {
+                                    complete="~~"
+                                }
+				rows[colRow][curCol] = fmt.Sprintf("%s%s%s", complete, task.Name, complete)
 			}
 		}
 		// print the rows
